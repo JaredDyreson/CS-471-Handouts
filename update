@@ -1,0 +1,31 @@
+#!/usr/bin/env zsh
+
+function __Make_Run () {
+
+    # Compile and run LaTeX files from the command line
+    # __Make_Run [OPTION] <FILENAME>
+
+    [[ ! -f "$1" ]] && (echo "[-] Cannot open file at: $1, cowardly refusing";exit)
+    [[ -z "$2" ]] &&  DEST="exported" || DEST="$2"
+    [[ ! -d "$DEST" ]] && mkdir "$DEST"
+    filename="$1:t:r"
+    rubber -vvvv --unsafe -d "$1"
+    latexmk -silent -c
+    mv "$filename".pdf "$DEST"
+    GREEN="\033[1;32m"
+    NOCOLOR="\033[0m"
+    echo "$GREEN"'Word count: '"$(textcount $1 | awk '/Words in text/ {print $4}')""$NOCOLOR"
+}
+
+#find . -type f -name '*.tex' | sort -n | while read line; do
+    #WAYPOINT="$PWD"
+    #PARENT="$(dirname "$line")"
+    #FILE="$(basename "$line")"
+    #__Make_Run "$FILE"
+    #cd "$WAYPOINT"
+#done
+
+
+find . -type f -name '*.pdf' -exec cp -ar {} "PDFs/" \;
+
+tree "PDFs"
